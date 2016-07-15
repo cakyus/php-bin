@@ -1,0 +1,29 @@
+#!/usr/bin/env php
+<?php
+
+$makeFile = getcwd().'/Makefile';
+
+$text = "all:";
+$text .= "\n\t/usr/bin/env php ".__FILE__." build";
+$text .= "\ninstall:";
+$text .= "\n\t/usr/bin/env php ".__FILE__." install";
+file_put_contents($makeFile, $text);
+
+// TODO check ~/bin is in $PATH
+
+if (isset($_SERVER['argv'][1]) && $_SERVER['argv'][1] == 'install') {
+	foreach( glob('*.php') as $file ) {
+		$file = realpath($file);
+		$outFile = $_SERVER['HOME'].'/bin/'.basename($file);
+		trigger_error("File: $file");
+		trigger_error("Outfile: $outFile");
+		if (is_file($outFile)) {
+			trigger_error("$outFile is already exists", E_USER_WARNING);
+			continue;
+		}
+		symlink($file, $outFile);
+	}
+	exit(0);
+}
+
+
